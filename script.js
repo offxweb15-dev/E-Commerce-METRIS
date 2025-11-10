@@ -266,7 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function toggleMenu() {
         if (!menuToggle || !navLinks) return;
         
-        isMenuOpen = !isMenuOpen;
+        isMenuOpen = !menuToggle.classList.contains('active');
         menuToggle.classList.toggle('active');
         menuToggle.setAttribute('aria-expanded', isMenuOpen);
         navLinks.classList.toggle('active');
@@ -284,20 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (menuToggle) {
         menuToggle.addEventListener('click', function(e) {
             e.stopPropagation();
-            this.classList.toggle('active');
-            navLinks.classList.toggle('active');
-            
-            // Update aria-expanded attribute
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !isExpanded);
-            
-            // Toggle body scroll
-            document.body.style.overflow = !isExpanded ? 'hidden' : '';
-            
-            // Close search if open when menu is toggled on mobile
-            if (isSearchOpen) {
-                toggleSearch();
-            }
+            toggleMenu();
         });
     }
     
@@ -313,9 +300,29 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close menu when clicking on a nav link
     const navLinkItems = document.querySelectorAll('.nav-links a');
     navLinkItems.forEach(item => {
-        item.addEventListener('click', function() {
+        item.addEventListener('click', function(e) {
             if (window.innerWidth <= 768) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
                 toggleMenu();
+                
+                // If it's an anchor link, scroll to the section after the menu closes
+                if (targetId && targetId.startsWith('#')) {
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        // Small delay to allow menu to close before scrolling
+                        setTimeout(() => {
+                            targetElement.scrollIntoView({ behavior: 'smooth' });
+                            // Update URL without adding to history
+                            history.pushState(null, '', targetId);
+                        }, 300);
+                    }
+                } else if (targetId && !targetId.startsWith('#')) {
+                    // For regular links, navigate after a small delay
+                    setTimeout(() => {
+                        window.location.href = targetId;
+                    }, 300);
+                }
             }
         });
     });
