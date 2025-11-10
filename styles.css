@@ -588,7 +588,7 @@ img {
     }
     
     .search-bar.active {
-        transform: translate(-50%, 10px);
+        transform: translate(-50%, 70px);
         z-index: 1002;
     }
     
@@ -685,9 +685,9 @@ img {
     }
     
     .search-bar.active {
-        transform: translateY(-50%) scaleX(1);
+        transform: translateY(50%) scaleX(1);
         top: 50%;
-        left: auto;
+        left: 0;
     }
 }
 
